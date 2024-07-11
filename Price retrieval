@@ -7,6 +7,7 @@ import requests
 import yfinance as yf
 import pandas as pd
 import numpy
+from pandas import Timestamp
 # Obtain a database connection to the MySQL instance
 
 db_host = 'localhost'
@@ -80,6 +81,16 @@ def convert_to_daily_data(data_vendor_id, symbol_id, data):
     return records
 
 
+def update_the_pricing_data(data_vendor_id, symbol_id, data):
+    new = ()
+    records = []
+    for tup in data:
+        if tup(0) >= Timestamp('2024-07-10 00:00:00-0400', tz='America/New_York'):
+            new = (data_vendor_id, symbol_id, tup[0], now, now, tup[1], tup[2], tup[3], tup[4], tup[5], tup[6])
+            records.append(new)
+    return records
+
+
 def insert_daily_data_into_db(daily_data):
     """
     Takes a list of tuples of daily data and adds it to the
@@ -116,7 +127,8 @@ def insert_daily_data_into_db(daily_data):
 #         print("Adding data for %s: %s out of %s" % (t[1], i+1, len_tickers))
 #         yf_data = get_daily_historic_data_yahoo(t[1])
 #         dyf_data = convert_numpy_int_to_int(yf_data)
-#         new_data = convert_to_daily_data('1', t[0], dyf_data)
+#         # new_data = convert_to_daily_data('1', t[0], dyf_data)
+#         new_data = update_the_pricing_data('1', t[0], dyf_data)
 #         print(new_data[0])
 #         insert_daily_data_into_db(new_data)
 #     print("Successfully added Yahoo Finance pricing data to DB.")
