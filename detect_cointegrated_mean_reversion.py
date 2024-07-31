@@ -1,7 +1,6 @@
 import pandas as pd
 import mysql.connector as msc
 import numpy as np
-from PIL.DdsImagePlugin import item1
 from statsmodels.tsa import stattools as ts
 import statsmodels.api as sm
 import time_series_tests as tst
