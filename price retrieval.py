@@ -12,7 +12,7 @@ from pandas import Timestamp
 
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Damilare20$'
+db_pass = 'Password'
 db_name = 'securities_master'
 try:
     con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
