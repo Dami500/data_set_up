@@ -64,8 +64,6 @@ def obtain_lagged_series(symbol, start_date, end_date, lags = 5):
     df_returns["direction"] = np.sign(df_returns["percent_change"])
     return df_returns.fillna(0)
 
-# print(obtain_lagged_series('AAPL', datetime(2004,5,12), datetime(2010,5,12), 5))
-
 
 if __name__ == '__main__':
     # create a lagged series of returns for any stock on the S&P
