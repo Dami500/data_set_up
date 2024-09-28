@@ -1,4 +1,4 @@
-These are the Python Scripts I use for algorithmic trading.
+These are the Python Scripts I use for setting up my virtual environment
 
 Symbols.py obtains the tickers for the companies on the S&P 500 as well as their sector and currency and stores it on an SQL database
 
