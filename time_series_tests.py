@@ -18,16 +18,17 @@ db_name = 'securities_master'
 con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name)
 
 
-def obtain_data_from_sec_master(symbol_id):
+def obtain_data_from_sec_master(symbol_id, start, end):
     """
     return data from Sec Master into a pandas dataframe
     parse dates
     """
-    select_str = """ select distinct securities_master.‘daily_price‘.‘price_date‘ as date, 
-    securities_master.‘daily_price‘.‘close_price‘ as close_price
-    from securities_master.‘daily_price‘
-    where securities_master.‘daily_price‘.‘symbol_id‘ = %s 
-    """ % symbol_id
+    select_str = """ select distinct securities_master.daily_price.price_date as date, 
+    securities_master.daily_price.close_price as close_price
+    from securities_master.daily_price
+    where securities_master.daily_price.symbol_id = %s and securities_master.daily_price.price_date >= %s and 
+    securities_master.daily_price.price_date <= %s
+    """ % (symbol_id, start, end)
     data = pd.read_sql_query(select_str, con, parse_dates = {"date": '%Y%m%d %H:%M:%S'})
     data = data.rename(columns = {"close_price": "%s" % symbol_id})
     return data.dropna()

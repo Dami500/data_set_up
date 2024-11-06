@@ -1,7 +1,7 @@
 from __future__ import print_function
 import pandas as pd
 import mysql.connector as msc
-import yfinance as yf
+
 
 
 if __name__ == "__main__":

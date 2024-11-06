@@ -5,7 +5,6 @@ import warnings
 import mysql.connector as msc
 import requests
 import yfinance as yf
-import pandas as pd
 import numpy
 from pandas import Timestamp
 # Obtain a database connection to the MySQL instance
