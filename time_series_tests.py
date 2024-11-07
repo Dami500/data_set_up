@@ -10,6 +10,8 @@ from numpy.random import randn
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
+import warnings
+warnings.filterwarnings('ignore')
 
 db_host = 'localhost'
 db_user = 'sec_user'
@@ -103,7 +105,10 @@ def plot_residuals(df):
     plt.plot(df['res'])
     plt.show()
 
-
+start_date = datetime.datetime(2011,1, 1).strftime('%Y-%m-%d')
+end_date = datetime.datetime(2013, 2, 1).strftime('%Y-%m-%d')
+data = obtain_data_from_sec_master(503,start_date, end_date)
+print(data)
 # if __name__ == "__main__":
 #     WMB = obtain_data_from_sec_master('10042')
 #     KMI = obtain_data_from_sec_master('9827')
