@@ -5,17 +5,23 @@ import warnings
 import mysql.connector as msc
 import requests
 import yfinance as yf
+import pandas as pd
 import numpy
 from pandas import Timestamp
 # Obtain a database connection to the MySQL instance
 
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Damilare20$'
+db_pass = 'Password'
 db_name = 'securities_master'
-plug ='caching_sha2_password'
-con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name, auth_plugin= plug)
-
+try:
+    con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
+    if con is not None:
+        print("Connected to MySQL database successfully!")
+    else:
+        print("Failed to connect to MySQL database.")
+except msc.Error as e:
+    print(f"Error connecting to MySQL: {e}")
 
 
 def obtain_list_of_db_tickers():
@@ -25,15 +31,14 @@ def obtain_list_of_db_tickers():
     con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
     with con:
         cur = con.cursor()
-        cur.execute("""SELECT securities_master.symbol.id, securities_master.symbol.ticker
-        FROM securities_master.symbol """)
+        cur.execute("""SELECT securities_master.‘symbol‘.‘id‘, securities_master.‘symbol‘.‘ticker‘
+        FROM securities_master.‘symbol‘ """)
         data = cur.fetchall()
-        return data
-        # db_tick = []
-        # for d in data:
-        #     tup = (d[0], d[1])
-        #     db_tick.append(tup)
-        # return db_tick
+        db_tick = []
+        for d in data:
+            tup = (d[0], d[1])
+            db_tick.append(tup)
+        return db_tick
 
 
 def convert_numpy_int_to_int(obj):
@@ -94,13 +99,13 @@ def insert_daily_data_into_db(daily_data):
     adj_close and volume)
     """
     # Create the insert strings
-    insert_str = """ INSERT INTO securities_master.daily_price
-    (securities_master.daily_price.data_vendor_id, securities_master.daily_price.symbol_id,
-    securities_master.daily_price.price_date, securities_master.daily_price.created_date,
-    securities_master.daily_price.last_updated_date, securities_master.daily_price.open_price,
-    securities_master.daily_price.high_price, securities_master.daily_price.low_price, 
-    securities_master.daily_price.close_price, securities_master.daily_price.volume, 
-    securities_master.daily_price.split) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    insert_str = """ INSERT INTO securities_master.‘daily_price‘
+    (securities_master.‘daily_price‘.‘data_vendor_id‘, securities_master.‘daily_price‘.‘symbol_id‘,
+    securities_master.‘daily_price‘.‘price_date‘, securities_master.‘daily_price‘.‘created_date‘,
+    securities_master.‘daily_price‘.‘last_updated_date‘, securities_master.‘daily_price‘.‘open_price‘,
+    securities_master.‘daily_price‘.‘high_price‘, securities_master.‘daily_price‘.‘low_price‘, 
+    securities_master.‘daily_price‘.‘close_price‘, securities_master.‘daily_price‘.‘volume‘, 
+    securities_master.‘daily_price‘.‘adj_close_price‘) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     # Using the MySQL connection, carry out an INSERT INTO for every symbol
     con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
@@ -117,13 +122,13 @@ def insert_daily_data_into_db(daily_data):
 #     # Loop over the tickers and insert the daily historical
 #     # data into the database
 #     tickers = obtain_list_of_db_tickers()
-#     # print(tickers)
 #     len_tickers = len(tickers)
 #     for i, t in enumerate(tickers):
 #         print("Adding data for %s: %s out of %s" % (t[1], i+1, len_tickers))
 #         yf_data = get_daily_historic_data_yahoo(t[1])
 #         dyf_data = convert_numpy_int_to_int(yf_data)
-#         new_data = convert_to_daily_data('1', t[0], dyf_data)
-#         # new_data = update_the_pricing_data('1', t[0], dyf_data)
+#         # new_data = convert_to_daily_data('1', t[0], dyf_data)
+#         new_data = update_the_pricing_data('1', t[0], dyf_data)
+#         print(new_data[0])
 #         insert_daily_data_into_db(new_data)
 #     print("Successfully added Yahoo Finance pricing data to DB.")

@@ -13,25 +13,25 @@ import datetime
 
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Password'
+db_pass = 'Damilare20$'
 db_name = 'securities_master'
-con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name)
+plug ='caching_sha2_password'
+con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name, auth_plugin= plug)
 
 
-def obtain_data_from_sec_master(symbol_id, start, end):
+def obtain_data_from_sec_master(symbol_id, start_date, end_date):
     """
     return data from Sec Master into a pandas dataframe
     parse dates
     """
-    select_str = """ select distinct securities_master.daily_price.price_date as date, 
-    securities_master.daily_price.close_price as close_price
+    select_str = """ select distinct securities_master.daily_price.price_date, 
+    securities_master.daily_price.close_price 
     from securities_master.daily_price
-    where securities_master.daily_price.symbol_id = %s and securities_master.daily_price.price_date >= %s and 
-    securities_master.daily_price.price_date <= %s
-    """ % (symbol_id, start, end)
+    where securities_master.daily_price.symbol_id = %s and securities_master.daily_price.price_date >= '%s' 
+    and securities_master.daily_price.price_date  <= '%s'
+    """ % (symbol_id, start_date, end_date)
     data = pd.read_sql_query(select_str, con, parse_dates = {"date": '%Y%m%d %H:%M:%S'})
-    data = data.rename(columns = {"close_price": "%s" % symbol_id})
-    return data.dropna()
+    return data
 
 
 def adf_test(data):
@@ -104,23 +104,23 @@ def plot_residuals(df):
     plt.show()
 
 
-if __name__ == "__main__":
-    WMB = obtain_data_from_sec_master('10042')
-    KMI = obtain_data_from_sec_master('9827')
-    df = pd.merge(WMB, KMI, how='inner', on = "date")
-    # Plot the two time series
-    plot_pairs_price_series(df, "9827", "10042")
-    # Display a scatter plot of the two time series
-    scatter_plot_pairs(df, "9827", "10042")
-    # Calculate optimal hedge ratio "beta"
-    res = ts.OLS(endog=df['10042'], exog = sm.add_constant(df["9827"]))
-    beta = res.fit()
-    beta_hr = beta.params.iloc[1]
-    # Calculate the residuals of the linear combination
-    df["res"] = df["10042"] - beta_hr * df["9827"]
-    print(df)
-    # Plot the residuals
-    plot_residuals(df)
-    # Calculate and output the CADF test on the residuals
-    cadf = adf_test(df['res'])
-    print(cadf)
+# if __name__ == "__main__":
+#     WMB = obtain_data_from_sec_master('10042')
+#     KMI = obtain_data_from_sec_master('9827')
+#     df = pd.merge(WMB, KMI, how='inner', on = "date")
+#     # Plot the two time series
+#     plot_pairs_price_series(df, "9827", "10042")
+#     # Display a scatter plot of the two time series
+#     scatter_plot_pairs(df, "9827", "10042")
+#     # Calculate optimal hedge ratio "beta"
+#     res = ts.OLS(endog=df['10042'], exog = sm.add_constant(df["9827"]))
+#     beta = res.fit()
+#     beta_hr = beta.params.iloc[1]
+#     # Calculate the residuals of the linear combination
+#     df["res"] = df["10042"] - beta_hr * df["9827"]
+#     print(df)
+#     # Plot the residuals
+#     plot_residuals(df)
+#     # Calculate and output the CADF test on the residuals
+#     cadf = adf_test(df['res'])
+#     print(cadf)
