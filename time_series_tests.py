@@ -27,8 +27,9 @@ def obtain_data_from_sec_master(symbol_id, start_date, end_date):
     select_str = """ select distinct securities_master.daily_price.price_date, 
     securities_master.daily_price.close_price 
     from securities_master.daily_price
-    where securities_master.daily_price.symbol_id = %s and securities_master.daily_price.price_date >= '%s' 
-    and securities_master.daily_price.price_date  <= '%s'
+    where securities_master.daily_price.symbol_id = %s 
+    # and securities_master.daily_price.price_date >= '%s'
+    # and securities_master.daily_price.price_date  <= '%s'
     """ % (symbol_id, start_date, end_date)
     data = pd.read_sql_query(select_str, con, parse_dates = {"date": '%Y%m%d %H:%M:%S'})
     return data
