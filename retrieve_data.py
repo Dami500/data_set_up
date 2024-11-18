@@ -1,23 +1,47 @@
-from __future__ import print_function
 import pandas as pd
 import mysql.connector as msc
-import yfinance as yf
+import warnings
 
+warnings.filterwarnings('ignore')
+db_host = 'localhost'
+db_user = 'sec_user'
+db_pass = 'Damilare20$'
+db_name = 'securities_master'
+plug ='caching_sha2_password'
+con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name, auth_plugin= plug)
 
-if __name__ == "__main__":
-    # Connect to the MySQL instance
-    db_host = 'localhost'
-    db_user = 'sec_user'
-    db_pass = 'Damilare20$'
-    db_name = 'securities_master'
-    con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
-    # Select all the historic Google adjusted close data
-    sql = """SELECT dp.‘price_date‘, dp.‘close_price‘
-    FROM securities_master.‘daily_price‘ AS dp
-    INNER JOIN securities_master.‘symbol‘ AS sym
-    ON dp.‘symbol_id‘ = sym.‘id‘
-    ORDER BY dp.‘price_date‘ ASC;
+def get_prices_id(tickers):
     """
-    # Create a pandas dataframe from the SQL query
-    goog = pd.read_sql(sql, con= con)
-    print(goog.tail())
+    Locates the corresponding symbol ID for each ticker in the list of tickers
+    returns a pandas dataframe for IDs
+    """
+    symbols = {}
+    for ticker in tickers:
+        select_str = """
+        SELECT securities_master.symbol.id
+        from securities_master.symbol
+        where securities_master.symbol.ticker = '%s'
+        """ % ticker
+        df = pd.read_sql_query(select_str, con)
+        symbols[ticker] = df.iloc[0,0]
+    return symbols
+
+def get_prices(locations):
+    """
+    Makes use of the symbol_id list to return dataframes of the prices of those assets
+    """
+    dataframes = []
+    for id in locations.keys():
+        select_str ="""SELECT *
+                       from securities_master.daily_price
+                       where securities_master.daily_price.symbol_id = '%s'
+                    """ % locations[id]
+        data = pd.read_sql_query(select_str, con)
+        specific_data = data[['symbol_id', 'price_date', 'open_price', 'high_price', 'low_price', 'close_price', 'volume']]
+        specific_data.rename(columns={'symbol_id':id}, inplace=True)
+        dataframes.append(specific_data)
+    for dataframe in dataframes:
+        print(dataframe)
+
+# symbols = get_prices_id(['AAPL', 'GOOG', 'GOOGL'])
+# get_prices(symbols)
