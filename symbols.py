@@ -61,5 +61,6 @@ def insert_snp500_symbols(sign):
 
 if __name__ == "__main__":
     sign = obtain_parse_wiki_snp500()
-    insert_snp500_symbols(sign[0:503])
-    print("%s symbols were successfully added." % len(sign))
+    print(sign)
+    # insert_snp500_symbols(sign[0:503])
+    # print("%s symbols were successfully added." % len(sign))
