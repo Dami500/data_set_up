@@ -7,7 +7,7 @@ import requests
 # Connect to the MySQL instance
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Damilare20$'
+db_pass = 'Damilare20%'
 db_name = 'securities_master'
 con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name)
 
@@ -46,10 +46,10 @@ def insert_snp500_symbols(sign):
     Insert the S&P500 symbols into the MySQL database.
     """
     # Create the insert strings
-    insert_str = """ INSERT INTO securities_master.‘symbol‘ (securities_master.‘symbol‘.‘ticker‘,
-    securities_master.‘symbol‘.‘instrument‘,securities_master.‘symbol‘.‘name‘, securities_master.‘symbol‘.‘sector‘,
-    securities_master.‘symbol‘.‘currency‘,securities_master.‘symbol‘.‘created_date‘,
-    securities_master.‘symbol‘.‘last_updated_date‘) VALUES (%s, %s, %s, %s, %s, %s, %s);
+    insert_str = """ INSERT INTO securities_master.symbol (securities_master.symbol.ticker,
+    securities_master.symbol.instrument,securities_master.symbol.name, securities_master.symbol.sector,
+    securities_master.symbol.currency,securities_master.symbol.created_date,
+    securities_master.symbol.last_updated_date) VALUES (%s, %s, %s, %s, %s, %s, %s);
     """
     # Using the MySQL connection, carry out
     # an INSERT INTO for every symbol
@@ -62,5 +62,5 @@ def insert_snp500_symbols(sign):
 if __name__ == "__main__":
     sign = obtain_parse_wiki_snp500()
     print(sign)
-    # insert_snp500_symbols(sign[0:503])
-    # print("%s symbols were successfully added." % len(sign))
+    insert_snp500_symbols(sign[0:503])
+    print("%s symbols were successfully added." % len(sign))

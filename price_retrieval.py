@@ -9,10 +9,9 @@ from pandas import Timestamp
 
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Damilare20$'
+db_pass = 'Damilare20%'
 db_name = 'securities_master'
-plug ='caching_sha2_password'
-con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name, auth_plugin= plug)
+con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name)
 
 
 def obtain_list_of_db_tickers():
@@ -57,8 +56,9 @@ def get_daily_historic_data_yahoo(ticker, start_date=datetime.datetime(2001, 1, 
     h_df.reset_index(inplace = True)
     prices = []
     for p in range(h_df.shape[0]):
-        tup = (h_df.iloc[p, 0], h_df.iloc[p, 1], h_df.iloc[p, 2], h_df.iloc[p, 3], h_df.iloc[p, 4], h_df.iloc[p, 5],
-               h_df.iloc[p, 6], h_df.iloc[p, 7])
+        tup = (h_df.iloc[p, 0].to_pydatetime(), float(h_df.iloc[p, 1]), float(h_df.iloc[p, 2]),
+               float(h_df.iloc[p, 3]), float(h_df.iloc[p, 4]), float(h_df.iloc[p, 5]),
+               float(h_df.iloc[p, 6]), float(h_df.iloc[p, 7]))
         prices.append(tup)
     return prices
 
@@ -96,7 +96,7 @@ def insert_daily_data_into_db(daily_data):
     securities_master.daily_price.last_updated_date, securities_master.daily_price.open_price,
     securities_master.daily_price.high_price, securities_master.daily_price.low_price, 
     securities_master.daily_price.close_price, securities_master.daily_price.volume, 
-    securities_master.daily_price.split) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    securities_master.daily_price.stock_splits) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     # Using the MySQL connection, carry out an INSERT INTO for every symbol
     con = msc.connect(host=db_host, user=db_user, passwd=db_pass, db=db_name, connect_timeout=28800)
@@ -118,7 +118,7 @@ if __name__ == "__main__":
         print("Adding data for %s: %s out of %s" % (t[1], i+1, len_tickers))
         yf_data = get_daily_historic_data_yahoo(t[1])
         dyf_data = convert_numpy_int_to_int(yf_data)
-        # new_data = convert_to_daily_data('1', t[0], dyf_data)
-        new_data = update_the_pricing_data('1', t[0], dyf_data)
+        new_data = convert_to_daily_data('1', t[0], dyf_data)
+        # new_data = update_the_pricing_data('1', t[0], dyf_data)
         insert_daily_data_into_db(new_data)
     print("Successfully added Yahoo Finance pricing data to DB.")

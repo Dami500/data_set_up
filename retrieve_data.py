@@ -5,10 +5,9 @@ import warnings
 warnings.filterwarnings('ignore')
 db_host = 'localhost'
 db_user = 'sec_user'
-db_pass = 'Damilare20$'
+db_pass = 'Damilare20%'
 db_name = 'securities_master'
-plug ='caching_sha2_password'
-con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name, auth_plugin= plug)
+con = msc.connect(host=db_host, user=db_user, password=db_pass, db=db_name)
 
 def get_prices_id(tickers):
     """
@@ -23,6 +22,7 @@ def get_prices_id(tickers):
         where securities_master.symbol.ticker = '%s'
         """ % ticker
         df = pd.read_sql_query(select_str, con)
+        print(df)
         symbols[ticker] = df.iloc[0,0]
     return symbols
 
@@ -43,5 +43,6 @@ def get_prices(locations):
     for dataframe in dataframes:
         print(dataframe)
 
-# symbols = get_prices_id(['AAPL', 'GOOG', 'GOOGL'])
+# symbols = get_prices_id(['AAPL', 'GOOG', 'SPY', 'LLY'])
+# print(symbols)
 # get_prices(symbols)
